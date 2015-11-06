@@ -6,4 +6,7 @@ package juan.project.world.entity.event;
  */
 public interface Event {
 
+	/**
+	 * Empty class used for syntax sugar :-)
+	 */
 }

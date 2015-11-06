@@ -6,6 +6,13 @@ package juan.project.world;
  */
 public enum CollisionType {
 
+	/**
+	 * Represents the collidable collision type
+	 */
 	COLLIDABLE,
+	
+	/**
+	 * Represents the not collidable collision type
+	 */
 	NOT_COLLIDABLE;
 }

@@ -13,6 +13,10 @@ import javax.imageio.ImageIO;
  */
 public class Assets {
 
+	/**
+	 * XXX: Yuk! clean this please...
+	 */
+	
 	public static final int PLAYER_WALK_RIGHT = 0;
 	public static final int PLAYER_WALK_LEFT = 1;
 	public static final int PLAYER_DEFAULT_RIGHT = 3;

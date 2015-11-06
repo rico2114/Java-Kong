@@ -8,6 +8,12 @@ import juan.project.world.entity.ActorModel;
  */
 public class BoundaryUtil {
 
+	/**
+	 * Checks if an actor is inside a given boundary 
+	 * @param actor	the actor
+	 * @param boundary	the boundary
+	 * @return	true if is inside of the boundary
+	 */
 	public static boolean inBounds(final ActorModel actor, final ActorModel boundary) {
 		int minX = actor.getPosition().getX();
 		int minY = actor.getPosition().getY();

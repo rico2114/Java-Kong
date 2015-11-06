@@ -30,17 +30,35 @@ import juan.project.world.entity.impl.PlayerActor;
  */
 public class Game extends JPanel implements ActionListener, KeyListener {
 
+	/**
+	 * Represents the serial of this panel
+	 */
 	private static final long serialVersionUID = -8165883146338627431L;
+	
+	/**
+	 * Represents a map of all the keys 
+	 * XXX: We can use a map for this to save at least 180 unused keys...
+	 */
 	private static final boolean [] keys = new boolean[200];
 	
+	/**
+	 * Represents the player
+	 */
 	private static final PlayerActor PLAYER = new PlayerActor(new Position(0, 15));
-	private static final Monkey MONKEY = new Monkey(new Position(0, 15));
-
-	public static boolean gameStarted;
 	
-
+	/**
+	 * Represents the monkey
+	 */
+	private static final Monkey MONKEY = new Monkey(new Position(0, 15));
+	
+	/**
+	 * Represents the game tick
+	 */
 	private final Timer timer = new Timer(10, this);
 
+	/**
+	 * Static calls
+	 */
 	static {		
 		GameMap.registerActor(PLAYER);
 		GameMap.registerActor(MONKEY);
@@ -48,10 +66,16 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 		MapGenerator.generateMap(PLAYER, MONKEY);
 	}
 	
+	/**
+	 * Construct the game
+	 */
 	public Game() {
 		timer.start();
 	}
 	
+	/**
+	 * Updates the logic of the map
+	 */
 	public void updateLogic() {
 		GameMap.updateLogic();
 	}
@@ -92,15 +116,15 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	
 	public void update() {
 		if (keys[68] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.RIGHT, Constants.SPEED));
+			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.RIGHT, Constants.PLAYER_SPEED));
 		} else if (keys[65] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.LEFT, Constants.SPEED));
+			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.LEFT, Constants.PLAYER_SPEED));
 		}
 		
 		if (keys[83] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.DOWN, Constants.SPEED));
+			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.DOWN, Constants.PLAYER_SPEED));
 		} else if (keys[87] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.UP, Constants.SPEED));
+			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.UP, Constants.PLAYER_SPEED));
 		}
 		
 		if (keys[32] == true) {

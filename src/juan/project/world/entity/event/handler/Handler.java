@@ -9,5 +9,10 @@ import juan.project.world.entity.event.Event;
  */
 public interface Handler<E extends Event> {
 
+	/**
+	 * The handler takes care of the interaction based on the implementation, the user pass an event and the handler intercepts it
+	 * @param actor	the actor
+	 * @param event	the event
+	 */
 	void interact(final ActorModel actor, final E event);
 }

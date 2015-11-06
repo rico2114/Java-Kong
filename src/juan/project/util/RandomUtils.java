@@ -8,5 +8,8 @@ import java.util.Random;
  */
 public class RandomUtils {
 
+	/**
+	 * Represents a random utility
+	 */
 	public static final Random RANDOM = new Random(); 
 }

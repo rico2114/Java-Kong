@@ -77,7 +77,7 @@ public class MapGenerator {
 			
 			if (deleted) {
 				if (Objects.nonNull(marioPlace)) {
-					player.getPosition().setY(marioPlace.getPosition().getY() - player.getDimension().getHeight());
+					player.getPosition().setY(marioPlace.getPosition().getY() + (Constants.FLOOR_HEIGHT / 2));
 				}
 				break;
 			}

@@ -9,7 +9,6 @@ import juan.project.graphics.Game;
  * @Author Juan Sebastian Quiceno <Juan.2114@hotmail.com>
  */
 public class Launcher {
-
 	
 	public static void main(String[] args) {
 		final JFrame frame = new JFrame("Donkey Kong.");

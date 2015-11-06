@@ -27,10 +27,20 @@ import com.google.common.collect.ListMultimap;
  */
 public class GameMap {
 
+	/**
+	 * Represents the {@link ListMultimap map} used for the two kind of {@link ActorModel models} {@link CollisionType#COLLIDABLE collidable} or {@link CollisionType#NOT_COLLIDABLE not collidable}
+	 */
 	private static final ListMultimap<CollisionType, ActorModel> actors = ArrayListMultimap.create();
 	
+	/**
+	 * Represents the game {@link Floor floor} divisions (number of floors)
+	 */
 	private static int divisions = 0;
 	
+	/**
+	 * Renders the map
+	 * @param g2d	the graphics instance
+	 */
 	public static void render(final Graphics2D g2d) {
 		g2d.setColor(Color.BLACK);
 		g2d.fillRect(0, 0, (int) Constants.DIMENSION.getWidth(), (int) Constants.DIMENSION.getHeight());
@@ -49,6 +59,11 @@ public class GameMap {
 		//renderCollision(g2d);
 	}
 	
+	/**
+	 * This method is merely used for debugging
+	 * This takes care of the clipping box
+	 * @param g2d	the graphics instance
+	 */
 	public static void renderCollision(final Graphics2D g2d) {
 		int times = 0;
 		for (Map.Entry<CollisionType, ActorModel> actor : actors.entries()) {
@@ -73,6 +88,9 @@ public class GameMap {
 		}
 	}
 	
+	/**
+	 * Process all the logic (collisions)
+	 */
 	public static void updateLogic() {
 		final List<ActorModel> collidable = actors.get(CollisionType.COLLIDABLE); 
 		final List<ActorModel> notCollidable = actors.get(CollisionType.NOT_COLLIDABLE); 
@@ -87,14 +105,35 @@ public class GameMap {
 		}
 	}
 	
+	/**
+	 * Registers an {@link ActorModel actor} into the {@link ListMultimap map}
+	 * @param actor	the actor to register
+	 */
 	public static void registerActor(final ActorModel actor) {
 		actors.put(actor.getCollisionType(), actor);
 	}
 	
+	/**
+	 * Deletes an {@link ActorModel actor} from the {@link ListMultimap map}
+	 * @param actor	the actor
+	 * @return	true if we could remove the actor
+	 */
+	public static boolean deleteActor(final ActorModel actor) {
+		return actors.remove(actor.getCollisionType(), actor);
+	}
+	
+	/**
+	 * Clears all the {@link ActorModel actors} from the {@link ListMultimap}
+	 */
 	public static void clearActors() {
 		actors.clear();
 	}
 	
+	/**
+	 * Gets all the {@link ActorModel actor} collisions
+	 * @param actor	the actor that we want to match collisions
+	 * @return	the list with all the collisions based on that actor
+	 */
 	public static List<CollidableActor> getActorCollition(final ActorModel actor) {
 		final List<CollidableActor> list = new ArrayList<>();
 		for (Map.Entry<CollisionType, ActorModel> possible : actors.entries()) {
@@ -109,7 +148,15 @@ public class GameMap {
 		return list;
 	}
 	
-	public static CollidableActor getActorCollition(final ActorModel actor, final int xRadious, final int yRadious, final Class<?> clasz) {
+	/**
+	 * Returns the first occurrence based on the given {@link ActorModel actor} as a test and some offsets 
+	 * @param actor	the actor
+	 * @param xOFfset	the offset in x
+	 * @param yOFfset	the offset in y
+	 * @param clasz	the class that we want to check if actor collides with
+	 * @return	the {@link CollidableActor collision} representation
+	 */
+	public static CollidableActor getActorCollition(final ActorModel actor, final int xOFfset, final int yOFfset, final Class<?> clasz) {
 		int w = actor.getDimension().getWidth();
 		int h = actor.getDimension().getHeight();
 		
@@ -133,7 +180,7 @@ public class GameMap {
 			
 			boolean same = collidable.getClass().getSimpleName().equals(clasz.getSimpleName());
 			if (same) {
-				final Rectangle actorR = new Rectangle(x, y, xRadious, yRadious);
+				final Rectangle actorR = new Rectangle(x, y, xOFfset, yOFfset);
 				final Rectangle collidableR = new Rectangle(cx, cy, cw, ch);
 
 				if (same && actorR.intersects(collidableR)) {
@@ -144,6 +191,12 @@ public class GameMap {
 		return null;
 	}
 	
+	/**
+	 * Does the list collides with the given class
+	 * @param list	the list of collidables 
+	 * @param clasz	the class that we want to match
+	 * @return	true if collides
+	 */
 	public static CollidableActor actorCollidesWith(final List<CollidableActor> list, final Class<?> clasz) {
 		for (CollidableActor collidable : list) {
 			if (collidable.getClass().getSimpleName().equals(clasz.getSimpleName())) {
@@ -153,22 +206,36 @@ public class GameMap {
 		return null;
 	}
 	
+	/**
+	 * Does the actor collides with anything
+	 * @param actor	the actor
+	 * @return	true if collides
+	 */
 	public static boolean actorCollides(final ActorModel actor) {
 		return !getActorCollition(actor).isEmpty();
 	}
 	
-	public static boolean deleteActor(final ActorModel actor) {
-		return actors.remove(actor.getCollisionType(), actor);
-	}
-	
+	/**
+	 * Sets the divisions of the map
+	 * @param val	the new divisions N
+	 */
 	public static void setDivisions(final int val) {
 		divisions = val;
 	}
 	
+	/**
+	 * Gets the divisions of the floors
+	 * @return	the divisions
+	 */
 	public static int getDivisions() {
 		return divisions;
 	}
 	
+	/**
+	 * @author Sebastían
+	 * 
+	 * This class takes care of the rendering hierarchy
+	 */
 	public static final class RenderingComparable implements Comparator<Entry<CollisionType, ActorModel>> {
 
 		public static final RenderingComparable SINGLETON = new RenderingComparable();
