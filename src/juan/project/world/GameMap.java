@@ -2,6 +2,7 @@ package juan.project.world;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.Map.Entry;
 import juan.project.game.Constants;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
+import juan.project.world.entity.impl.Barrel;
 import juan.project.world.entity.impl.PlayerActor;
 import juan.project.world.entity.impl.Stair;
 
@@ -48,13 +50,26 @@ public class GameMap {
 	}
 	
 	public static void renderCollision(final Graphics2D g2d) {
-		g2d.setColor(Color.CYAN);
+		int times = 0;
 		for (Map.Entry<CollisionType, ActorModel> actor : actors.entries()) {
 			ActorModel model = actor.getValue();
 			int x = model.getPosition().getX();
 			int y = model.getPosition().getY();
+			
+			g2d.setColor(Color.CYAN);
 
 			g2d.drawRect(x, y, model.getDimension().getWidth(), model.getDimension().getHeight());
+			
+			g2d.setColor(new Color((int)(Math.random() * 0x1000000)));
+
+			//if (model.getClass().equals(PlayerActor.class)) {
+			if (times ++ < 3) {
+				int myX = model.getPosition().getX()/* + model.getDimension().getWidth()*/;
+				int myY = model.getPosition().getY()/* + model.getDimension().getHeight()*/;
+				g2d.drawString("MY X: " + myX + " MY Y: " + myY, myX, myY);
+				times= 0;
+			}
+			//}
 		}
 	}
 	
@@ -94,7 +109,42 @@ public class GameMap {
 		return list;
 	}
 	
-	public static CollidableActor actorCollidesWith(final List<CollidableActor> list, final Class<?> clasz, final ActorModel actor) {
+	public static CollidableActor getActorCollition(final ActorModel actor, final int xRadious, final int yRadious, final Class<?> clasz) {
+		int w = actor.getDimension().getWidth();
+		int h = actor.getDimension().getHeight();
+		
+		int x = actor.getPosition().getX();
+		int y = actor.getPosition().getY();
+		
+		if (actor instanceof PlayerActor || actor instanceof Barrel) {
+			x += w;
+			y += h;
+		}
+
+		for (Map.Entry<CollisionType, ActorModel> possible : actors.entries()) {
+			if (possible.getKey().equals(CollisionType.NOT_COLLIDABLE)) 
+				continue;
+			
+			final CollidableActor collidable = (CollidableActor) possible.getValue();
+			int cx = collidable.getPosition().getX();
+			int cy = collidable.getPosition().getY();
+			int cw = collidable.getDimension().getWidth();
+			int ch = collidable.getDimension().getHeight();
+			
+			boolean same = collidable.getClass().getSimpleName().equals(clasz.getSimpleName());
+			if (same) {
+				final Rectangle actorR = new Rectangle(x, y, xRadious, yRadious);
+				final Rectangle collidableR = new Rectangle(cx, cy, cw, ch);
+
+				if (same && actorR.intersects(collidableR)) {
+					return collidable;
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static CollidableActor actorCollidesWith(final List<CollidableActor> list, final Class<?> clasz) {
 		for (CollidableActor collidable : list) {
 			if (collidable.getClass().getSimpleName().equals(clasz.getSimpleName())) {
 				return collidable;

@@ -15,6 +15,7 @@ import juan.project.world.entity.CollidableActor;
  * @Author Juan Sebastian Quiceno <Juan.2114@hotmail.com>
  */
 public class Stair extends CollidableActor {
+	
 	private static final int MINIMUM = 80;
 	private static final int MAXIMUM = 180;
 	

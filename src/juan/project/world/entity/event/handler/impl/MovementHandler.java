@@ -28,16 +28,20 @@ public class MovementHandler implements Handler<MoveEvent> {
 	private static final ActorModel SCREEN_COLLISION = new ActorModel(null, new Position(0, 0), new Dimension((int) Constants.DIMENSION.getWidth(), (int) Constants.DIMENSION.getHeight()));
 	public static final MovementHandler MOVEMENT_HANDLER = new MovementHandler();
 	
+	/**
+	 * XXX: Clean this uggly class!!! :C
+	 */
+	
 	@Override
 	public void interact(ActorModel actor, MoveEvent event) {
 		final List<CollidableActor> actorsColliding = GameMap.getActorCollition(actor);
 		
-		CollidableActor floorCollition = GameMap.actorCollidesWith(actorsColliding, Floor.class, actor);
-		CollidableActor stairCollition = GameMap.actorCollidesWith(actorsColliding, Stair.class, actor);
+		CollidableActor floorCollition = GameMap.actorCollidesWith(actorsColliding, Floor.class);
+		CollidableActor stairCollition = GameMap.actorCollidesWith(actorsColliding, Stair.class);
 
 		boolean isPlayer = actor instanceof PlayerActor;
 		boolean isBarrel = actor instanceof Barrel;
-		
+
 		PlayerActor playerActor = null;
 		Barrel barrel = null;
 		
@@ -135,6 +139,8 @@ public class MovementHandler implements Handler<MoveEvent> {
 		if (Objects.isNull(mainCollitionCause)) {
 			mainCollitionCause = stairCollition;
 		}
+		
+		CollidableActor offsetCollition = GameMap.getActorCollition(actor, 1, Constants.SCALED_FLOOR_HEIGHT * 2, Floor.class);
 
 		if (Objects.isNull(mainCollitionCause)) {
 			boolean pass = false;
@@ -142,6 +148,13 @@ public class MovementHandler implements Handler<MoveEvent> {
 				if (playerActor.isJumping())
 					pass = true;
 			}
+			
+			if (!pass) {
+				mainCollitionCause = offsetCollition;
+				if (Objects.nonNull(mainCollitionCause))
+					pass = true;
+			}
+			
 			if (!pass) {
 				System.out.println("Im standing on nothing!");
 				return;
@@ -153,23 +166,57 @@ public class MovementHandler implements Handler<MoveEvent> {
 				newX /= 1.5;
 			}
 		}
-		
-		
+				
 		int setX = actor.getPosition().getX() + newX;
 		int setY = actor.getPosition().getY() + newY;
-		
+				
 		if (isPlayer && playerActor.isJumping() && Objects.isNull(mainCollitionCause)) {
 			mainCollitionCause = SCREEN_COLLISION;
 		}
 		
-		if ((setX < mainCollitionCause.getPosition().getX() || setX + actor.getDimension().getWidth() > (mainCollitionCause.getPosition().getX() + mainCollitionCause.getDimension().getWidth()))) {
+		int collX = mainCollitionCause.getPosition().getX();
+		int colWidth = mainCollitionCause.getDimension().getWidth();
+		boolean isFloor = mainCollitionCause instanceof Floor;
+		Floor floorCollision = isFloor ? (Floor) mainCollitionCause : null;
+		
+		if (isFloor) {
+			boolean pass = true;
 			if (isBarrel) {
-				barrel.setGoingDown(true);
-				barrel.setGoingRight(!barrel.isGoingRight());
+				if (barrel.isInStair()) {
+					pass = false;
+				}
 			}
 			
-			System.out.println("Out of map bro.");
-			return;
+			if (isPlayer) {
+				if (playerActor.isInStair() || playerActor.isJumping())
+					pass = false;
+			}
+						
+			if (pass) {
+				if (setX + actor.getDimension().getWidth() >= collX + colWidth) {
+					if (!floorCollision.getContinuity().contains(MoveDirection.RIGHT)) {
+						if (isBarrel) {
+							switchBarrelDirection(barrel);
+						}
+						System.out.println("Out of map bro FOR RIGHT.");
+						return;
+					}
+				}
+				
+				if (setX <= collX) {
+					if (!floorCollision.getContinuity().contains(MoveDirection.LEFT)) {
+						if (isBarrel) {
+							switchBarrelDirection(barrel);
+						}
+						System.out.println("Out of map bro FOR LEFT.");
+						return;
+					}
+				}
+
+				if (Objects.nonNull(offsetCollition) && ((Floor) offsetCollition).specialFloor) {
+					setY = offsetCollition.getPosition().getY() - actor.getDimension().getHeight();
+				}
+			}
 		}
 
 		actor.getPosition().setX(setX);
@@ -181,6 +228,11 @@ public class MovementHandler implements Handler<MoveEvent> {
 		if (isBarrel) {
 			handleBarrelAnimations(barrel);
 		}
+	}
+	
+	public static void switchBarrelDirection(final Barrel barrel) {
+		barrel.setGoingDown(true);
+		barrel.setGoingRight(!barrel.isGoingRight());
 	}
 	
 	private static void handleBarrelAnimations(final Barrel barrel) {

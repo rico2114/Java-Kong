@@ -33,8 +33,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	private static final long serialVersionUID = -8165883146338627431L;
 	private static final boolean [] keys = new boolean[200];
 	
-	private static final PlayerActor PLAYER = new PlayerActor(new Position(35, 15));
-	private static final Monkey MONKEY = new Monkey(new Position(35, 15));
+	private static final PlayerActor PLAYER = new PlayerActor(new Position(0, 15));
+	private static final Monkey MONKEY = new Monkey(new Position(0, 15));
 
 	public static boolean gameStarted;
 	

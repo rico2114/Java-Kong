@@ -27,6 +27,10 @@ public class Monkey extends CollidableActor {
 	public Monkey(Position position) {
 		super(Assets.IMAGES[Assets.MONKEY_LEFT_HAND], position, new Dimension(Assets.IMAGES[Assets.MONKEY_LEFT_HAND].getWidth(), Assets.IMAGES[Assets.MONKEY_LEFT_HAND].getHeight()));
 	}
+	
+	public Floor getStartingFloor() {
+		return startingFloor;
+	}
 
 	public void setStartingFloor(final Floor floor) {
 		this.startingFloor = floor;
@@ -65,7 +69,7 @@ public class Monkey extends CollidableActor {
 	public void doCollision(ActorModel actor) {
 		if (actor.getClass().equals(PlayerActor.class)) {
 			// / you won!
-			System.out.println("I WON");
+			//System.out.println("I WON");
 		}
 	}
 }

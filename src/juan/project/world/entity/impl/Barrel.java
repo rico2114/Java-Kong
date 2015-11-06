@@ -20,11 +20,13 @@ import juan.project.world.entity.event.impl.MoveEvent.MoveDirection;
  */
 public class Barrel extends CollidableActor {
 
+	private List<CollidableActor> processedCollisions = new ArrayList<>();
 	private final List<Stair> stairsCompleted = new ArrayList<>();
 	
 	private boolean goingRight = true;
 	private boolean goingDown;
 	private boolean goingDownEffective;
+	private boolean inStair;
 	
 	private int floorId = 0;
 	private int animationId = Assets.BARREL_FIRST;
@@ -63,6 +65,10 @@ public class Barrel extends CollidableActor {
 		this.goingDown = state;
 	}
 	
+	public boolean isInStair() {
+		return inStair;
+	}
+	
 	public void setGoingDownEffective(final boolean state) {
 		this.goingDownEffective = state;
 	}
@@ -92,7 +98,11 @@ public class Barrel extends CollidableActor {
 	
 	@Override
 	public void render(Graphics2D g2d) {
-		int speed = 3; // add complexity
+		int speed = 3; //XXX: add complexity
+		
+		// XXX: I KNOW THIS IS UGLY, BUT I NEED TO CLEAN UP MOVEMENT FIRST YUK!
+		processedCollisions = GameMap.getActorCollition(this);
+		inStair = GameMap.actorCollidesWith(processedCollisions, Stair.class) != null;
 		
 		if (!goingDownEffective) {
 			if (goingRight) {

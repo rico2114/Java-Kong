@@ -14,6 +14,8 @@ import juan.project.world.Position;
  */
 public class ActorModel implements Renderable {
 	
+	public float lastStepTaken;
+	
 	private BufferedImage image;
 	private final Position position;
 	private final Dimension dimension;

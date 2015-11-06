@@ -16,4 +16,5 @@ public class BoundaryUtil {
 		
 		return maxX >= boundary.getPosition().getX() && minX <= boundary.getPosition().getX() + boundary.getDimension().getWidth() && maxY >= boundary.getPosition().getY() && minY <= boundary.getPosition().getY() + boundary.getDimension().getHeight();
 	}
+	
 }
