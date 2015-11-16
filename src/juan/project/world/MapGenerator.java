@@ -33,7 +33,8 @@ public class MapGenerator {
 		MoveDirection opositeDirection = MoveDirection.LEFT;
 		
 		Floor marioPlace = null;
-		Floor floorNode = doFloor(0, initialY, 0);
+		// XXX: magic variable: 170
+		Floor floorNode = doFloor(constructDirection.equals(MoveDirection.RIGHT) ? 0 : (int) (Constants.DIMENSION.getWidth() - 170), initialY, 0);
 		for (int i = 0; i < yDivisions; i++) {
 			boolean cr = constructDirection.equals(MoveDirection.RIGHT);
 			Floor x = null;

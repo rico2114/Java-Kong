@@ -131,4 +131,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 			JumpHandler.JUMP_HANDLER.interact(PLAYER, new JumpEvent(Constants.JUMP_ALTITUDE, 1.8F));
 		}
 	}
+	
+	public static PlayerActor getPlayer() {
+		return PLAYER;
+	}
 }

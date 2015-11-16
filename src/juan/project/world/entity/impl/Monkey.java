@@ -3,6 +3,7 @@ package juan.project.world.entity.impl;
 import java.awt.Graphics2D;
 
 import juan.project.graphics.Assets;
+import juan.project.graphics.Game;
 import juan.project.util.RandomUtils;
 import juan.project.world.Dimension;
 import juan.project.world.GameMap;
@@ -38,7 +39,9 @@ public class Monkey extends CollidableActor {
 
 	@Override
 	public void render(Graphics2D g2d) {
-		int barrelModTime = 188; // change based on complexity;
+		int difference = Math.abs(getPosition().getY() - Game.getPlayer().getPosition().getY());
+		System.out.println("difference: " + difference);
+		int barrelModTime = 188 /*difference*/; // change based on complexity;
 		int barrelTopTicks = 25; // change based on complexity;
 
 		if (System.currentTimeMillis() - lastMove >= 145) {

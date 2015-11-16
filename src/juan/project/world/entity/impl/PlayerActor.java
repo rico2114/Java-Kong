@@ -1,11 +1,15 @@
 package juan.project.world.entity.impl;
 
 import java.awt.Graphics2D;
+import java.util.Objects;
 
+import juan.project.game.Constants;
 import juan.project.graphics.Assets;
 import juan.project.world.Dimension;
+import juan.project.world.GameMap;
 import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
+import juan.project.world.entity.CollidableActor;
 import juan.project.world.entity.event.handler.impl.RefreshDirectionHandler;
 import juan.project.world.entity.event.impl.MoveEvent.MoveDirection;
 import juan.project.world.entity.event.impl.RefreshDirectionEvent;
@@ -99,44 +103,30 @@ public class PlayerActor extends ActorModel {
 				if (Math.abs(y - jumpYOriginal) >= MAXIMUM_JUMP_MOD) {
 					increasingJump = false;
 				}
-
-				if (y == jumpYOriginal) {
-					jumpYOriginal = -1;
-					jumpMod = 0;
-					isJumping = false;
-					increasingJump = true;
-					RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(this, RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
+				
+				if (!increasingJump) {
+					CollidableActor offsetCollition = GameMap.getActorCollition(this, 1, Constants.SCALED_FLOOR_HEIGHT * 2, Floor.class);
+					if (Objects.nonNull(offsetCollition)) {
+						completeJump();
+					}
 				}
 			}
 			lastUpdate = System.currentTimeMillis();
 		}
 		
 		getPosition().setY(y);
-		/*if (jumpingAltitude > 0) {
-			if (increasingJump) {
-				y -= jumpingModifier;
-				jumpingModifier += jumpDecreaseRate;
-			} else {
-				y += jumpingModifier;
-				jumpingModifier -= jumpDecreaseRate;
-			}
-						
-			if (jumpingModifier >= jumpingAltitude) {
-				increasingJump = false;
-			}
-			
-			if (!increasingJump && jumpingModifier <= 0) {
-				jumpingAltitude = 0;
-				jumpingModifier = 0;
-				jumpDecreaseRate = 0;
-				
-				RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(this, RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
-			}
-		}*/
-		
-		///getPosition().setY(y); FIX THIS! TO COLIDE ON JUMP
-		
-		g2d.drawImage(getImage(), getPosition().getX(), y/*getPosition().getY()*/, null);
+		g2d.drawImage(getImage(), getPosition().getX(), y, null);
+	}
+	
+	/**
+	 * Called when the jumping is finished
+	 */
+	private void completeJump() {
+		jumpYOriginal = -1;
+		jumpMod = 0;
+		isJumping = false;
+		increasingJump = true;
+		RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(this, RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
 	}
 
 }
