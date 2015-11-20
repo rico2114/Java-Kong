@@ -255,10 +255,27 @@ public class MovementHandler implements Handler<MoveEvent> {
 		} else if (event.getDirection().equals(MoveDirection.LEFT)) {
 			next = playerActor.getWalkingImage() == Assets.PLAYER_WALK_LEFT ? Assets.PLAYER_WALK_LEFT_2 : Assets.PLAYER_WALK_LEFT;
 		}
+
+		if (playerActor.hasHammer()) {
+			if (event.getDirection().equals(MoveDirection.RIGHT)) {
+				if (playerActor.smashDelayPassed())
+					next = playerActor.getWalkingImage() == Assets.PLAYER_HAMMER_RIGHT ? Assets.PLAYER_HAMMER_RIGHT_2 : Assets.PLAYER_HAMMER_RIGHT;
+				else
+					next = Assets.PLAYER_HAMMER_SMASH_RIGHT;
+			} else {
+				if (playerActor.smashDelayPassed())
+					next = playerActor.getWalkingImage() == Assets.PLAYER_HAMMER_LEFT ? Assets.PLAYER_HAMMER_LEFT_2 : Assets.PLAYER_HAMMER_LEFT;
+				else
+					next = Assets.PLAYER_HAMMER_SMASH_LEFT;
+			}
+		}
+
 		
 		if (playerActor.isInStair()) {
 			next = playerActor.getWalkingImage() == Assets.PLAYER_STAIR_LEFT ? Assets.PLAYER_STAIR_RIGHT : Assets.PLAYER_STAIR_LEFT;			
 		}
+		
+		
 			
 		if (!playerActor.isJumping() && next != -1 && (System.currentTimeMillis() - playerActor.getWalkingUpdate()) > 75) {
 			playerActor.setImage(Assets.IMAGES[next]);

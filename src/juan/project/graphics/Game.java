@@ -71,6 +71,8 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	 */
 	public Game() {
 		timer.start();
+		byte defaultTime = (byte) (((3 & 3) << 6) | 60);
+		GameMap.setMaximumTime(defaultTime);
 	}
 	
 	/**

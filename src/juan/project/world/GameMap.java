@@ -15,6 +15,7 @@ import juan.project.game.Constants;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
 import juan.project.world.entity.impl.Barrel;
+import juan.project.world.entity.impl.Floor;
 import juan.project.world.entity.impl.PlayerActor;
 import juan.project.world.entity.impl.Stair;
 
@@ -37,13 +38,27 @@ public class GameMap {
 	 */
 	private static int divisions = 0;
 	
+	private static long lastTimeCycle;
+	
+	private static byte maximum_time;
+	private static int level;
+	
+	private static boolean lost;
+	private static String lostMessage = "";
+	
 	/**
 	 * Renders the map
 	 * @param g2d	the graphics instance
 	 */
 	public static void render(final Graphics2D g2d) {
-		g2d.setColor(Color.BLACK);
+		g2d.setColor(Color.WHITE);
 		g2d.fillRect(0, 0, (int) Constants.DIMENSION.getWidth(), (int) Constants.DIMENSION.getHeight());
+		
+		if (lost) {
+			renderLost(g2d);
+			return;
+		}
+		
 		
 		final Collection<Entry<CollisionType, ActorModel>> collection = actors.entries();
 		final List<Entry<CollisionType, ActorModel>> list = new ArrayList<>();
@@ -56,7 +71,45 @@ public class GameMap {
 			entry.getValue().render(g2d);
 		}
 		
+		g2d.setColor(Color.BLACK);
+		
+		// Por ende el maximo minuto es 3 :)...
+		byte second = (byte) (maximum_time & 0x3F);
+		g2d.drawString("Level: " + level + " ; Remaining Time: " + ((maximum_time >> 6) & 3) + ":" + (second < 10 ? "0" : "") + (second), (int) Constants.DIMENSION.getWidth() / 2, 10);
+		
+		if (System.currentTimeMillis() - lastTimeCycle >= 1000) {
+			byte minute = (byte) ((maximum_time >> 6) & 3);
+			byte sec = (byte) ((maximum_time & 0x3F) - 1);
+			
+			if (minute <= 0 && sec <= 0) {
+				gameOver("The time has finished.");
+			}
+			
+			if (sec <= 0) {
+				minute -= 1;
+				sec = 60;
+			}
+			
+			
+			maximum_time = (byte) ((minute << 6) | ((sec) & 0x3F));			
+			lastTimeCycle = System.currentTimeMillis();
+		}
 		//renderCollision(g2d);
+	}
+	
+	public static void renderLost(final Graphics2D g2d) {
+		int mX = (int) (Constants.DIMENSION.getWidth() / 2) - 50;
+		int mY = (int) (Constants.DIMENSION.getHeight() / 2) - 50;
+		g2d.setColor(Color.BLACK);
+		g2d.drawString("You have lost", mX, mY);
+		g2d.drawString(lostMessage, mX - 20, mY + 25);
+		
+		g2d.drawString("Press any key to restart...", mX - 20, mY + 50);
+	}
+	
+	public static void gameOver(final String lm) {
+		lost = true;
+		lostMessage = lm;
 	}
 	
 	/**
@@ -204,6 +257,14 @@ public class GameMap {
 			}
 		}
 		return null;
+	}
+
+	public static void setMaximumTime(final byte maxTime) {
+		maximum_time = maxTime;
+	}
+	
+	public static void increaseLevel() {
+		level += 1;
 	}
 	
 	/**

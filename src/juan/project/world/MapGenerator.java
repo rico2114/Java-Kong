@@ -7,6 +7,7 @@ import java.util.Objects;
 import juan.project.game.Constants;
 import juan.project.world.entity.event.impl.MoveEvent.MoveDirection;
 import juan.project.world.entity.impl.Floor;
+import juan.project.world.entity.impl.Hammer;
 import juan.project.world.entity.impl.Monkey;
 import juan.project.world.entity.impl.PlayerActor;
 import juan.project.world.entity.impl.Stair;
@@ -32,7 +33,7 @@ public class MapGenerator {
 		MoveDirection constructDirection = MoveDirection.RIGHT;
 		MoveDirection opositeDirection = MoveDirection.LEFT;
 		
-		Floor marioPlace = null;
+		boolean placedHammer = false;
 		// XXX: magic variable: 170
 		Floor floorNode = doFloor(constructDirection.equals(MoveDirection.RIGHT) ? 0 : (int) (Constants.DIMENSION.getWidth() - 170), initialY, 0);
 		for (int i = 0; i < yDivisions; i++) {
@@ -42,13 +43,23 @@ public class MapGenerator {
 			
 			if (Objects.isNull(monkey.getStartingFloor())) {
 				monkey.setStartingFloor(x);
+				monkey.getPosition().setX(x.getPosition().getX() + ((x.getDimension().getWidth() / 2) - (monkey.getDimension().getWidth() / 2)));
+				monkey.getPosition().setY(x.getPosition().getY() - monkey.getDimension().getHeight());
+			}
+			
+			if (!placedHammer && i > 0 && Math.random() > 0.5D) {
+				GameMap.registerActor(new Hammer(new Position(x.getPosition().getX() / 2, x.getPosition().getY() - Constants.FLOOR_HEIGHT * 3 )));
+				placedHammer = true;
 			}
 			
 			List<Floor> floors = doScaledFloors(floorNode.getPosition().getX() + (cr ? smallFloorWidth : 0), floorNode.getPosition().getY(), bigFloorWidth, SLOPE_FLOOR_AMOUNT, constructDirection);
 			floorNode = floors.get(floors.size() - 1);
 			for (Floor f : floors) {
 				GameMap.registerActor(f);
+				
 			}
+			
+			
 			
 			x = doFloor(floorNode.getPosition().getX() + (cr ? 0 : -smallFloorWidth), floorNode.getPosition().getY(), smallFloorWidth).addContinuity(opositeDirection);
 			GameMap.registerActor(x);
@@ -59,8 +70,9 @@ public class MapGenerator {
 			Stair stair = null;
 			int half = (smallFloorWidth / 2) - (Constants.STAIR_DEFAULT_WIDTH / 2);
 			GameMap.registerActor(stair = doStair(floorNode.getPosition().getX() + half, floorNode.getPosition().getY(), yDivisions));
+			
+			// for the stair modifications :)
 			floorNode = doFloor(floorNode.getPosition().getX(), floorNode.getPosition().getY() + stair.getDimension().getHeight(), smallFloorWidth);
-
 			int stairEndY = stair.getPosition().getY() + stair.getDimension().getHeight();
 			int floorEndY = floorNode.getPosition().getY() + floorNode.getDimension().getHeight();
 			boolean deleted = false;
@@ -72,19 +84,17 @@ public class MapGenerator {
 			if (floorEndY >= Constants.DIMENSION.getHeight()) {
 				GameMap.deleteActor(floorNode);
 				deleted = true;
-			} else {
-				marioPlace = floorNode;
 			}
 			
 			if (deleted) {
-				if (Objects.nonNull(marioPlace)) {
-					player.getPosition().setY(marioPlace.getPosition().getY() + (Constants.FLOOR_HEIGHT / 2));
+				if (Objects.nonNull(x)) {
+					player.getPosition().setX(x.getPosition().getX());
+					player.getPosition().setY(x.getPosition().getY() - player.getDimension().getHeight());
 				}
 				break;
 			}
 
 			MoveDirection opDir = constructDirection;
-
 			constructDirection = opositeDirection;
 			opositeDirection = opDir;
 		}

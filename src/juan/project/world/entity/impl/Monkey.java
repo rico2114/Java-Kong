@@ -40,7 +40,7 @@ public class Monkey extends CollidableActor {
 	@Override
 	public void render(Graphics2D g2d) {
 		int difference = Math.abs(getPosition().getY() - Game.getPlayer().getPosition().getY());
-		System.out.println("difference: " + difference);
+		//System.out.println("difference: " + difference);
 		int barrelModTime = 188 /*difference*/; // change based on complexity;
 		int barrelTopTicks = 25; // change based on complexity;
 

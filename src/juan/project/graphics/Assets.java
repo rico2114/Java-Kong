@@ -35,8 +35,18 @@ public class Assets {
 	public static final int MONKEY_RIGHT_HAND = 16;
 	public static final int MONKEY_NORMAL = 17;
 	public static final int MONKEY_DROP_BALL = 18;
+	public static final int MAP_HAMMER = 19;
+	public static final int PLAYER_DEFAULT_HAMMER_LEFT = 20;
+	public static final int PLAYER_DEFAULT_HAMMER_RIGHT = 21;
 
-	public static BufferedImage[] IMAGES = new BufferedImage[19];
+	public static final int PLAYER_HAMMER_LEFT = 22;
+	public static final int PLAYER_HAMMER_RIGHT = 23;
+	public static final int PLAYER_HAMMER_LEFT_2 = 24;
+	public static final int PLAYER_HAMMER_RIGHT_2 = 25;
+
+	public static final int PLAYER_HAMMER_SMASH_LEFT = 26;
+	public static final int PLAYER_HAMMER_SMASH_RIGHT = 27;
+	public static BufferedImage[] IMAGES = new BufferedImage[28];
 
 	static {
 		String path = "./assets/";
@@ -63,6 +73,19 @@ public class Assets {
 			IMAGES[MONKEY_RIGHT_HAND] = ImageIO.read(new File(path + MONKEY_RIGHT_HAND + ".png"));
 			IMAGES[MONKEY_NORMAL] = ImageIO.read(new File(path + MONKEY_NORMAL + ".png"));
 			IMAGES[MONKEY_DROP_BALL] = ImageIO.read(new File(path + MONKEY_DROP_BALL + ".png"));
+			
+			IMAGES[MAP_HAMMER] = ImageIO.read(new File(path + MAP_HAMMER + ".png"));
+
+			IMAGES[PLAYER_DEFAULT_HAMMER_LEFT] = ImageIO.read(new File(path + PLAYER_DEFAULT_HAMMER_LEFT + ".png"));
+			IMAGES[PLAYER_DEFAULT_HAMMER_RIGHT] = ImageIO.read(new File(path + PLAYER_DEFAULT_HAMMER_RIGHT + ".png"));
+
+			IMAGES[PLAYER_HAMMER_LEFT] = ImageIO.read(new File(path + PLAYER_HAMMER_LEFT + ".png"));
+			IMAGES[PLAYER_HAMMER_RIGHT] = ImageIO.read(new File(path + PLAYER_HAMMER_RIGHT + ".png"));
+			IMAGES[PLAYER_HAMMER_LEFT_2] = ImageIO.read(new File(path + PLAYER_HAMMER_LEFT_2 + ".png"));
+			IMAGES[PLAYER_HAMMER_RIGHT_2] = ImageIO.read(new File(path + PLAYER_HAMMER_RIGHT_2 + ".png"));
+			
+			IMAGES[PLAYER_HAMMER_SMASH_LEFT] = ImageIO.read(new File(path + PLAYER_HAMMER_SMASH_LEFT + ".png"));
+			IMAGES[PLAYER_HAMMER_SMASH_RIGHT] = ImageIO.read(new File(path + PLAYER_HAMMER_SMASH_RIGHT + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

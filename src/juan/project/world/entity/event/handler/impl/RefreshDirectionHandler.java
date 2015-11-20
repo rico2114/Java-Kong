@@ -27,6 +27,21 @@ public class RefreshDirectionHandler implements Handler<RefreshDirectionEvent> {
 			return;
 		
 		int image = playerActor.getLastDirection().equals(MoveDirection.RIGHT) ? Assets.PLAYER_DEFAULT_RIGHT : Assets.PLAYER_DEFAULT_LEFT;
+		
+		if (playerActor.hasHammer()) {
+			if (image == Assets.PLAYER_DEFAULT_RIGHT) {
+				if (playerActor.smashDelayPassed())
+					image = Assets.PLAYER_DEFAULT_HAMMER_RIGHT;
+				else
+					image = Assets.PLAYER_HAMMER_SMASH_RIGHT;
+			} else {
+				if (playerActor.smashDelayPassed())
+					image = Assets.PLAYER_DEFAULT_HAMMER_LEFT;
+				else
+					image = Assets.PLAYER_HAMMER_SMASH_LEFT;
+			}
+
+		}
 		actor.setImage(Assets.IMAGES[image]);
 	}
 

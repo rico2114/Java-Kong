@@ -22,6 +22,18 @@ public class PlayerActor extends ActorModel {
 
 	private static final int MAXIMUM_JUMP_MOD = 40;
 	
+	private boolean smashedBarrel;
+	private long smashDelay;
+	
+	public void smashBarrel() {
+		smashedBarrel = true;
+		smashDelay = 11;
+	}
+	
+	public boolean smashDelayPassed() {
+		return smashDelay <= 0;
+	}
+	
 	private long lastUpdate;
 	private int jumpYOriginal = -1;
 	private boolean isJumping;
@@ -32,6 +44,9 @@ public class PlayerActor extends ActorModel {
 	private int walkingImage;
 	private long lastWalkingUpdate = System.currentTimeMillis();
 	private MoveDirection lastDirection = MoveDirection.RIGHT;
+	
+	private boolean hasHammer = false;
+	private long hammerInitTime;
 
 	public PlayerActor(Position position) {
 		super(Assets.IMAGES[Assets.PLAYER_DEFAULT_RIGHT], position, new Dimension(Assets.IMAGES[Assets.PLAYER_DEFAULT_RIGHT].getWidth(), Assets.IMAGES[Assets.PLAYER_DEFAULT_RIGHT].getHeight()));
@@ -106,12 +121,30 @@ public class PlayerActor extends ActorModel {
 				
 				if (!increasingJump) {
 					CollidableActor offsetCollition = GameMap.getActorCollition(this, 1, Constants.SCALED_FLOOR_HEIGHT * 2, Floor.class);
+					
 					if (Objects.nonNull(offsetCollition)) {
 						completeJump();
 					}
 				}
 			}
 			lastUpdate = System.currentTimeMillis();
+		}
+		
+		if (hasHammer) {
+			if (System.currentTimeMillis() - hammerInitTime >= 10_000) { // 10 seconds
+				hasHammer = false;
+				RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(this, RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
+			}
+			
+		}
+		
+		if (smashedBarrel) {
+			smashDelay --;
+			
+			if (smashDelay <= 0) {
+				smashedBarrel = false;
+				RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(this, RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
+			}
 		}
 		
 		getPosition().setY(y);
@@ -128,5 +161,15 @@ public class PlayerActor extends ActorModel {
 		increasingJump = true;
 		RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(this, RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
 	}
+
+	public boolean hasHammer() {
+		return hasHammer;
+	}
+	
+	public void addHammer() {
+		hasHammer = true;
+		hammerInitTime = System.currentTimeMillis();
+	}
+	
 
 }

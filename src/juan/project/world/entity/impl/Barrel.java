@@ -11,8 +11,10 @@ import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
 import juan.project.world.entity.event.handler.impl.MovementHandler;
+import juan.project.world.entity.event.handler.impl.RefreshDirectionHandler;
 import juan.project.world.entity.event.impl.MoveEvent;
 import juan.project.world.entity.event.impl.MoveEvent.MoveDirection;
+import juan.project.world.entity.event.impl.RefreshDirectionEvent;
 
 /**
  * Created with eclipse 12/10/2015 0:53:57
@@ -23,6 +25,7 @@ public class Barrel extends CollidableActor {
 	private List<CollidableActor> processedCollisions = new ArrayList<>();
 	private final List<Stair> stairsCompleted = new ArrayList<>();
 	
+	private boolean deregister = false;
 	private boolean goingRight = true;
 	private boolean goingDown;
 	private boolean goingDownEffective;
@@ -92,7 +95,27 @@ public class Barrel extends CollidableActor {
 	@Override
 	public void doCollision(ActorModel actor) {
 		if (actor.getClass().equals(PlayerActor.class)) {
-			System.out.println("GAME END,");
+			
+			final PlayerActor player = (PlayerActor) actor;
+			if (player.hasHammer()) {
+				if (goingRight && player.getLastDirection().equals(MoveDirection.LEFT)) {
+					player.setWalkingImage(Assets.PLAYER_HAMMER_SMASH_LEFT);
+					deregister = true;
+				}
+				
+				if (!goingRight && player.getLastDirection().equals(MoveDirection.RIGHT)) {
+					player.setWalkingImage(Assets.PLAYER_HAMMER_SMASH_RIGHT);
+					deregister = true;
+				}
+				
+				if (deregister) {
+					player.smashBarrel();
+					RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(((ActorModel) actor), RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
+				}
+			}
+			
+			if (!deregister)
+				System.out.println("GAME END,");
 		}
 	}
 	
@@ -116,7 +139,7 @@ public class Barrel extends CollidableActor {
 			MovementHandler.MOVEMENT_HANDLER.interact(this, new MoveEvent(MoveDirection.DOWN, speed));
 		}
 				
-		if (getFloorId() == GameMap.getDivisions() - 2) {
+		if ((getFloorId() == GameMap.getDivisions() - 2) || deregister) {
 			GameMap.deleteActor(this);
 		}
 		
