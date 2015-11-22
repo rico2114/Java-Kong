@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Objects;
 
 import juan.project.game.Constants;
+import juan.project.graphics.Game;
 import juan.project.world.entity.event.impl.MoveEvent.MoveDirection;
 import juan.project.world.entity.impl.Floor;
 import juan.project.world.entity.impl.Hammer;
 import juan.project.world.entity.impl.Monkey;
 import juan.project.world.entity.impl.PlayerActor;
+import juan.project.world.entity.impl.Princess;
 import juan.project.world.entity.impl.Stair;
 
 /**
@@ -30,8 +32,10 @@ public class MapGenerator {
 		int smallFloorWidth = bigFloorWidth / 2;
 		int initialY = monkey.getPosition().getY() + monkey.getDimension().getHeight();		
 				
-		MoveDirection constructDirection = MoveDirection.RIGHT;
-		MoveDirection opositeDirection = MoveDirection.LEFT;
+		MoveDirection constructDirection = Game.getLevel().getConstructDirection();
+		MoveDirection opositeDirection = constructDirection.equals(MoveDirection.RIGHT) ? MoveDirection.LEFT : MoveDirection.RIGHT;
+		
+		Princess princess = null;
 		
 		boolean placedHammer = false;
 		// XXX: magic variable: 170
@@ -45,10 +49,12 @@ public class MapGenerator {
 				monkey.setStartingFloor(x);
 				monkey.getPosition().setX(x.getPosition().getX() + ((x.getDimension().getWidth() / 2) - (monkey.getDimension().getWidth() / 2)));
 				monkey.getPosition().setY(x.getPosition().getY() - monkey.getDimension().getHeight());
+				
+				GameMap.registerActor(monkey);
 			}
 			
 			if (!placedHammer && i > 0 && Math.random() > 0.5D) {
-				GameMap.registerActor(new Hammer(new Position(x.getPosition().getX() / 2, x.getPosition().getY() - Constants.FLOOR_HEIGHT * 3 )));
+				GameMap.registerActor(new Hammer(new Position(x.getPosition().getX() / 2, x.getPosition().getY() - Constants.FLOOR_HEIGHT * 3)));
 				placedHammer = true;
 			}
 			
@@ -59,10 +65,16 @@ public class MapGenerator {
 				
 			}
 			
-			
-			
 			x = doFloor(floorNode.getPosition().getX() + (cr ? 0 : -smallFloorWidth), floorNode.getPosition().getY(), smallFloorWidth).addContinuity(opositeDirection);
 			GameMap.registerActor(x);
+			
+			if (Objects.isNull(princess)) {
+				int xx = floorNode.getPosition().getX() + (cr ? 0 : -smallFloorWidth);
+				princess = new Princess(new Position(xx, 0));
+				int yy = floorNode.getPosition().getY() - princess.getDimension().getHeight();
+				princess.getPosition().setY(yy);
+				GameMap.registerActor(princess);
+			}
 			
 			if (!cr) {
 				floorNode = x;
@@ -90,6 +102,7 @@ public class MapGenerator {
 				if (Objects.nonNull(x)) {
 					player.getPosition().setX(x.getPosition().getX());
 					player.getPosition().setY(x.getPosition().getY() - player.getDimension().getHeight());
+					GameMap.registerActor(player);
 				}
 				break;
 			}

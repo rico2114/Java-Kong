@@ -46,7 +46,16 @@ public class Assets {
 
 	public static final int PLAYER_HAMMER_SMASH_LEFT = 26;
 	public static final int PLAYER_HAMMER_SMASH_RIGHT = 27;
-	public static BufferedImage[] IMAGES = new BufferedImage[28];
+	
+	public static final int PRINCESS_LEFT = 28;
+	public static final int PRINCESS_RIGHT = 29;
+	
+	public static final int LOGIN_BACKGROUND = 30;
+
+	public static final int MONKEY_INTRO = 31;
+	public static final int MONKEY_INTRO_2 = 32;
+
+	public static BufferedImage[] IMAGES = new BufferedImage[33];
 
 	static {
 		String path = "./assets/";
@@ -86,6 +95,15 @@ public class Assets {
 			
 			IMAGES[PLAYER_HAMMER_SMASH_LEFT] = ImageIO.read(new File(path + PLAYER_HAMMER_SMASH_LEFT + ".png"));
 			IMAGES[PLAYER_HAMMER_SMASH_RIGHT] = ImageIO.read(new File(path + PLAYER_HAMMER_SMASH_RIGHT + ".png"));
+			
+			IMAGES[PRINCESS_LEFT] = ImageIO.read(new File(path + PRINCESS_LEFT + ".png"));
+			IMAGES[PRINCESS_RIGHT] = ImageIO.read(new File(path + PRINCESS_RIGHT + ".png"));
+
+			IMAGES[LOGIN_BACKGROUND] = ImageIO.read(new File(path + LOGIN_BACKGROUND + ".jpg"));
+
+			IMAGES[MONKEY_INTRO] = ImageIO.read(new File(path + MONKEY_INTRO + ".png"));
+			IMAGES[MONKEY_INTRO_2] = ImageIO.read(new File(path + MONKEY_INTRO_2 + ".png"));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

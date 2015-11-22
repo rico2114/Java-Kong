@@ -27,7 +27,7 @@ public class JumpHandler implements Handler<JumpEvent> {
 		
 
 		playerActor.setJumping(true);
-		playerActor.setJumpingMod(2);
+		playerActor.setJumpingMod(3);
 		
 		int image = playerActor.getLastDirection().equals(MoveDirection.RIGHT) ? Assets.PLAYER_JUMP_RIGHT : Assets.PLAYER_JUMP_LEFT;
 		playerActor.setImage(Assets.IMAGES[image]);

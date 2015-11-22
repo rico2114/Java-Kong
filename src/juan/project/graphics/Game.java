@@ -12,6 +12,8 @@ import javax.swing.Timer;
 
 import juan.project.game.Constants;
 import juan.project.world.GameMap;
+import juan.project.world.GameStage;
+import juan.project.world.LevelConfiguration;
 import juan.project.world.MapGenerator;
 import juan.project.world.Position;
 import juan.project.world.entity.event.handler.impl.JumpHandler;
@@ -30,6 +32,10 @@ import juan.project.world.entity.impl.PlayerActor;
  */
 public class Game extends JPanel implements ActionListener, KeyListener {
 
+	private static final LevelConfiguration [] LEVELS = new LevelConfiguration[] {
+		new LevelConfiguration(MoveDirection.RIGHT, 2), new LevelConfiguration(MoveDirection.LEFT, 1)
+	};
+	
 	/**
 	 * Represents the serial of this panel
 	 */
@@ -44,7 +50,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	/**
 	 * Represents the player
 	 */
-	private static final PlayerActor PLAYER = new PlayerActor(new Position(0, 15));
+	private static PlayerActor PLAYER = new PlayerActor(new Position(0, 15));
 	
 	/**
 	 * Represents the monkey
@@ -55,14 +61,13 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	 * Represents the game tick
 	 */
 	private final Timer timer = new Timer(10, this);
+	
+	private static int level;
 
 	/**
 	 * Static calls
 	 */
 	static {		
-		GameMap.registerActor(PLAYER);
-		GameMap.registerActor(MONKEY);
-
 		MapGenerator.generateMap(PLAYER, MONKEY);
 	}
 	
@@ -105,6 +110,29 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		if (GameMap.getGameStage().equals(GameStage.USERNAME_SELECT)) {
+			System.out.println(e.getKeyCode());
+			if (e.getKeyCode() == 8) {
+				GameMap.deleteChar();
+			} else if (e.getKeyCode() == 10 || e.getKeyCode() == 16) {
+				if (e.getKeyCode() == 10) {
+					GameMap.login();
+				} else {
+					return;
+				}
+			} else {
+				GameMap.appendToUsername("" + e.getKeyChar());
+			}
+		}
+		
+		
+		if (GameMap.getGameStage().equals(GameStage.DEAD) || GameMap.getGameStage().equals(GameStage.NEW_LEVEL)) {
+			GameMap.clearActors();
+			MapGenerator.generateMap(Game.PLAYER, Game.MONKEY);
+			GameMap.setGameStage(GameStage.PLAYING);
+			return;
+		}
+		
 		keys[e.getKeyCode()] = true;
 	}
 
@@ -134,7 +162,23 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 		}
 	}
 	
+	public static Monkey getMonkey() {
+		return MONKEY;
+	}
+	
 	public static PlayerActor getPlayer() {
 		return PLAYER;
+	}
+	
+	public static void setLevel(final int l) {
+		level = l;
+	}
+	
+	public static int getLevelId() {
+		return level;
+	}
+	
+	public static LevelConfiguration getLevel() {
+		return LEVELS[level];
 	}
 }

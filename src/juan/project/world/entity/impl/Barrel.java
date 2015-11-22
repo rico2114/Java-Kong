@@ -7,6 +7,7 @@ import java.util.List;
 import juan.project.graphics.Assets;
 import juan.project.world.Dimension;
 import juan.project.world.GameMap;
+import juan.project.world.GameStage;
 import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
@@ -95,9 +96,10 @@ public class Barrel extends CollidableActor {
 	@Override
 	public void doCollision(ActorModel actor) {
 		if (actor.getClass().equals(PlayerActor.class)) {
-			
 			final PlayerActor player = (PlayerActor) actor;
 			if (player.hasHammer()) {
+				
+				
 				if (goingRight && player.getLastDirection().equals(MoveDirection.LEFT)) {
 					player.setWalkingImage(Assets.PLAYER_HAMMER_SMASH_LEFT);
 					deregister = true;
@@ -108,14 +110,25 @@ public class Barrel extends CollidableActor {
 					deregister = true;
 				}
 				
+				if (goingDown && !player.isInStair()) {
+					player.setWalkingImage(Assets.PLAYER_HAMMER_SMASH_RIGHT);
+					deregister = true;
+				}
+				
+				if (player.isInStair()) {
+					deregister = false;
+				}
+				
 				if (deregister) {
 					player.smashBarrel();
 					RefreshDirectionHandler.REFRESH_DIRECTION_HANDLER.interact(((ActorModel) actor), RefreshDirectionEvent.REFRESH_DIRECTION_EVENT);
 				}
 			}
 			
-			if (!deregister)
-				System.out.println("GAME END,");
+			if (!deregister) {
+				GameMap.displayMessage(GameStage.DEAD, "You have lost", "You were struck by barrel.");
+			}
+				
 		}
 	}
 	

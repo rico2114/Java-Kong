@@ -163,7 +163,7 @@ public class MovementHandler implements Handler<MoveEvent> {
 		
 		if (isPlayer) {
 			if (playerActor.isJumping()) {
-				newX /= 1.5;
+				newX /= 1;
 			}
 		}
 				

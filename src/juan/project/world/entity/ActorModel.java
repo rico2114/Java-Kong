@@ -1,9 +1,7 @@
 package juan.project.world.entity;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.Objects;
 
 import juan.project.graphics.Renderable;
 import juan.project.world.CollisionType;

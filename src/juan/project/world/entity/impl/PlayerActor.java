@@ -1,5 +1,6 @@
 package juan.project.world.entity.impl;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Objects;
 
@@ -149,6 +150,9 @@ public class PlayerActor extends ActorModel {
 		
 		getPosition().setY(y);
 		g2d.drawImage(getImage(), getPosition().getX(), y, null);
+		g2d.setColor(Color.RED);
+		g2d.drawString(GameMap.getUsername(), getPosition().getX(), y);
+
 	}
 	
 	/**
