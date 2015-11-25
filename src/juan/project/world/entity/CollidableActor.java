@@ -14,12 +14,27 @@ import juan.project.world.Position;
  */
 public abstract class CollidableActor extends ActorModel {
 
+	/**
+	 * Constructs a collidable actor
+	 * @param image	the image of the actor
+	 * @param position	the position of the actor
+	 * @param dimension	the dimension of the actor
+	 */
 	public CollidableActor(final BufferedImage image, Position position, Dimension dimension) {
 		super(image, position, dimension);
 	}
 
+	/**
+	 * Does the collision with the actor
+	 * @param actor	the actor
+	 */
 	public abstract void doCollision(final ActorModel actor);
 
+	/**
+	 * Do our collidable actor collides with a desired actor
+	 * @param actor	the actor to check collition with
+	 * @return	true if it collides
+	 */
 	public boolean collidesWith(final ActorModel actor) {
 		return BoundaryUtil.inBounds(this, actor);
 	}

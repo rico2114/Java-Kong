@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 
 import juan.project.game.Constants;
 import juan.project.graphics.Assets;
-import juan.project.graphics.Game;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
 import juan.project.world.entity.impl.Barrel;
@@ -31,9 +30,33 @@ import com.google.common.collect.ListMultimap;
  * Created with eclipse 8/10/2015 20:26:04
  * @Author Juan Sebastian Quiceno <Juan.2114@hotmail.com>
  */
-public class GameMap {
+public class GameLogic {
 
+	/**
+	 * Represents the intro actors
+	 */
+	private static final List<ActorModel> introActors = new ArrayList<>();
+	
+	/**
+	 * Represents the last climb up used for the cutscene
+	 */
+	private static long lastClimbUp;
+	
+	/**
+	 * Represents the cutscene loop
+	 */
+	private static int loopCutscene;
+	
+	/**
+	 * Some more variables for the cutscene
+	 */
+	private static int cutX = 0, cutY = 0, cutWidth = (int) (Constants.DIMENSION.getWidth()), cutHeight = (int) (Constants.DIMENSION.getHeight());
+	
+	/**
+	 * Represents a cached version of the login box color
+	 */
 	private static final Color LOGIN_BOX_COLOR = new Color(192, 192, 192, 125);
+	
 	/**
 	 * Represents the {@link ListMultimap map} used for the two kind of {@link ActorModel models} {@link CollisionType#COLLIDABLE collidable} or {@link CollisionType#NOT_COLLIDABLE not collidable}
 	 */
@@ -44,33 +67,66 @@ public class GameMap {
 	 */
 	private static int divisions = 0;
 	
+	/**
+	 * Represents the time cycle (used to increment the time every second)
+	 */
 	private static long lastTimeCycle;
 	
+	/**
+	 * Represents the maximum time for the game
+	 */
 	private static byte maximum_time;
 	
+	/**
+	 * Represent the two lost messages (cached)
+	 */
 	private static String lostMessage[] = new String[] {
 		"", ""
 	};
 	
+	/**
+	 * Represents the username of the player
+	 */
 	private static StringBuilder username = new StringBuilder();
-	private static int accountGraphic;
+	
+	/**
+	 * Represents an username tool used to display some extra graphics effect
+	 */
+	private static int usernameTool;
+	
+	/**
+	 * Represents the render help
+	 */
 	private static String renderHelp = "|";
 	
+	/**
+	 * Represents the current stage of the game
+	 */
 	private static GameStage gameStage = GameStage.USERNAME_SELECT;
 	
+	/**
+	 * Appends a piece of text to the username
+	 * @param append	the appended char
+	 */
 	public static void appendToUsername(final String append) {
-		if (username.length() >= 20)
+		if (username.length() >= Constants.MAXIMUM_USERNAME_LENGTH)
 			return;
 		
 		username.append(append);
 	}
 	
-	public static void deleteChar() {
+	/**
+	 * Deletes a char from the username if the keyboard backspace has been pressed
+	 */
+	protected static void deleteChar() {
 		int length = username.length();
 		int newLength = length <= 1 ? 0 : length -1;
 		username.setLength(newLength);
 	}
 	
+	/**
+	 * Represents the login method to initialize the game
+	 */
 	public static void login() {
 		if (username.length() <= 0)
 			return;
@@ -78,11 +134,12 @@ public class GameMap {
 		gameStage = GameStage.INTRO;
 	}
 	
-	private static final List<ActorModel> introActors = new ArrayList<>();
-	
+	/**
+	 * Static initializers for the intro 
+	 */
 	static {
-		int width = 640;
-		int height = 480;
+		int width = (int) Constants.DIMENSION.getWidth();
+		int height = (int) Constants.DIMENSION.getHeight();
 		int n = 6;
 		int hFactor = height / n;
 		int y = hFactor;
@@ -93,7 +150,6 @@ public class GameMap {
 			introActors.add(MapGenerator.doStair(mX - Constants.STAIR_LINE_WIDTH, y, hFactor));
 			y += hFactor;
 		}
-		
 		
 		introActors.add(new Monkey(new Position(mX, height - hFactor)));
 	}
@@ -114,75 +170,72 @@ public class GameMap {
 
 			int x = widhtMiddle - (widhtOffset << 1);
 			int y = heightMiddle - widhtOffset;
-			
+
 			int xEnd = widhtOffset + widhtOffset << 1;
 			int yEnd = widhtOffset >> 1;
-			
+
 			final AffineTransform old = g2d.getTransform();
-			
+
 			g2d.setColor(LOGIN_BOX_COLOR);
 			g2d.fillRect(x, y, xEnd, yEnd);
-			
+
 			g2d.setTransform(old);
 			int textX = x + (widhtOffset >> 1);
 			int textY = y + ((yEnd / 2) + 4);
 			g2d.setColor(Color.BLACK);
-			
-			if (accountGraphic % 40 == 0) {
+
+			if (usernameTool % 40 == 0) {
 				renderHelp = "";
-			} else if (accountGraphic % 81 == 0) {
+			} else if (usernameTool % 81 == 0) {
 				renderHelp = "|";
 			}
-			accountGraphic ++;
+			usernameTool++;
 
 			if (username.length() <= 0) {
 				g2d.drawString(renderHelp, textX, textY);
 			}
-			
+
 			g2d.drawString(username.toString() + renderHelp, textX, textY);
-			
+
 			g2d.scale(2, 2);
 			g2d.setColor(Color.BLACK);
 			g2d.drawString("Username:", 50, 105);
 			break;
-			
+
 		case INTRO:
 			doIntro(g2d);
 			break;
-			
+
 		case DEAD:
 			renderDisplayMessages(g2d);
 			break;
-			
+
 		case PLAYING:
 			final Collection<Entry<CollisionType, ActorModel>> collection = actors.entries();
 			final List<Entry<CollisionType, ActorModel>> list = new ArrayList<>();
-			
+
 			list.addAll(collection);
 			Collections.sort(list, RenderingComparable.SINGLETON);
 			for (Entry<CollisionType, ActorModel> entry : list) {
 				entry.getValue().render(g2d);
 			}
-			
+
 			g2d.setColor(Color.BLACK);
 			byte second = (byte) (maximum_time & 0x3F);
 			g2d.drawString("Level: " + Game.getLevelId() + " ; Remaining Time: " + ((maximum_time >> 6) & 3) + ":" + (second < 10 ? "0" : "") + (second), (int) Constants.DIMENSION.getWidth() / 2, 10);
 			handleTimer();
 			break;
-			
+
 		case NEW_LEVEL:
 			renderDisplayMessages(g2d);
 			break;
 		}
-		
-		
-		//renderCollision(g2d);
 	}
 	
-	private static long lastClimbUp;
-	private static int loopCutscene;
-	private static int cutX = 0, cutY = 0, cutWidth = (int) (Constants.DIMENSION.getWidth()), cutHeight = (int) (Constants.DIMENSION.getHeight());
-	
+	/**
+	 * Does the introduction of the game
+	 * @param g2d	the graphics instance
+	 */
 	private static void doIntro(final Graphics2D g2d) {
 		int height = (int) Constants.DIMENSION.getHeight();
 		int width = (int) Constants.DIMENSION.getWidth();
@@ -225,7 +278,9 @@ public class GameMap {
 		loopCutscene ++;
 	}
 		
-	
+	/**
+	 * Handles the timer in bitwise :)
+	 */
 	private static void handleTimer() { 
 		// 1000 millisecs -> 1 sec
 		if (System.currentTimeMillis() - lastTimeCycle >= 1000) {
@@ -246,6 +301,10 @@ public class GameMap {
 		}
 	}
 	
+	/**
+	 * Renders all the displaying messages
+	 * @param g2d	the graphics instance
+	 */
 	private static void renderDisplayMessages(final Graphics2D g2d) {
 		int mX = (int) (Constants.DIMENSION.getWidth() / 2) - 50;
 		int mY = (int) (Constants.DIMENSION.getHeight() / 2) - 50;
@@ -256,6 +315,12 @@ public class GameMap {
 		g2d.drawString("Press any key to continue...", mX - 20, mY + 50);
 	}
 	
+	/**
+	 * Sets the display messages to a desired set of messages
+	 * @param stage	the stage of the game to switch to
+	 * @param lm0	the first message
+	 * @param lm	the second message
+	 */
 	public static void displayMessage(final GameStage stage, final String lm0, final String lm) {
 		setGameStage(stage);
 		lostMessage[0] = lm0;
@@ -281,14 +346,12 @@ public class GameMap {
 			
 			g2d.setColor(new Color((int)(Math.random() * 0x1000000)));
 
-			//if (model.getClass().equals(PlayerActor.class)) {
 			if (times ++ < 3) {
-				int myX = model.getPosition().getX()/* + model.getDimension().getWidth()*/;
-				int myY = model.getPosition().getY()/* + model.getDimension().getHeight()*/;
+				int myX = model.getPosition().getX();
+				int myY = model.getPosition().getY();
 				g2d.drawString("MY X: " + myX + " MY Y: " + myY, myX, myY);
 				times= 0;
 			}
-			//}
 		}
 	}
 	
@@ -410,18 +473,34 @@ public class GameMap {
 		return null;
 	}
 	
+	/**
+	 * Represents the username
+	 * @return	the username
+	 */
 	public static String getUsername() {
 		return username.toString();
 	}
 	
+	/**
+	 * Gets the game stage
+	 * @return	the game stage
+	 */
 	public static GameStage getGameStage() {
 		return gameStage;
 	}
 	
+	/**
+	 * Sets the game stage to a desired stage
+	 * @param stage	the stage
+	 */
 	public static void setGameStage(final GameStage stage) { 
 		gameStage = stage;
 	}
 
+	/**
+	 * Sets the maximum time for the level
+	 * @param maxTime	the maximum time
+	 */
 	public static void setMaximumTime(final byte maxTime) {
 		maximum_time = maxTime;
 	}

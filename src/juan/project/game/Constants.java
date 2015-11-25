@@ -42,5 +42,10 @@ public class Constants {
 	 * Represents the jump altitude
 	 */
 	public static final int JUMP_ALTITUDE = 40;
+	
+	/**
+	 * Represents the maximum username length
+	 */
+	public static final int MAXIMUM_USERNAME_LENGTH = 20;
 
 }

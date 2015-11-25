@@ -57,6 +57,9 @@ public class Assets {
 
 	public static BufferedImage[] IMAGES = new BufferedImage[33];
 
+	/**
+	 * Static initializers
+	 */
 	static {
 		String path = "./assets/";
 		try {

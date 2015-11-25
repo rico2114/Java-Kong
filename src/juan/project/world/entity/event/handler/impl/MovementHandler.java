@@ -7,7 +7,7 @@ import juan.project.game.Constants;
 import juan.project.graphics.Assets;
 import juan.project.util.RandomUtils;
 import juan.project.world.Dimension;
-import juan.project.world.GameMap;
+import juan.project.world.GameLogic;
 import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
@@ -25,19 +25,25 @@ import juan.project.world.entity.impl.Stair;
  */
 public class MovementHandler implements Handler<MoveEvent> {
 
+	/**
+	 * Represents the default screen collision
+	 */
 	private static final ActorModel SCREEN_COLLISION = new ActorModel(null, new Position(0, 0), new Dimension((int) Constants.DIMENSION.getWidth(), (int) Constants.DIMENSION.getHeight()));
+	
+	/**
+	 * Represents the movement handler
+	 */
 	public static final MovementHandler MOVEMENT_HANDLER = new MovementHandler();
 	
 	/**
 	 * XXX: Clean this uggly class!!! :C
 	 */
-	
 	@Override
 	public void interact(ActorModel actor, MoveEvent event) {
-		final List<CollidableActor> actorsColliding = GameMap.getActorCollition(actor);
+		final List<CollidableActor> actorsColliding = GameLogic.getActorCollition(actor);
 		
-		CollidableActor floorCollition = GameMap.actorCollidesWith(actorsColliding, Floor.class);
-		CollidableActor stairCollition = GameMap.actorCollidesWith(actorsColliding, Stair.class);
+		CollidableActor floorCollition = GameLogic.actorCollidesWith(actorsColliding, Floor.class);
+		CollidableActor stairCollition = GameLogic.actorCollidesWith(actorsColliding, Stair.class);
 
 		boolean isPlayer = actor instanceof PlayerActor;
 		boolean isBarrel = actor instanceof Barrel;
@@ -140,7 +146,7 @@ public class MovementHandler implements Handler<MoveEvent> {
 			mainCollitionCause = stairCollition;
 		}
 		
-		CollidableActor offsetCollition = GameMap.getActorCollition(actor, 1, Constants.SCALED_FLOOR_HEIGHT * 2, Floor.class);
+		CollidableActor offsetCollition = GameLogic.getActorCollition(actor, 1, Constants.SCALED_FLOOR_HEIGHT * 2, Floor.class);
 
 		if (Objects.isNull(mainCollitionCause)) {
 			boolean pass = false;
@@ -213,7 +219,7 @@ public class MovementHandler implements Handler<MoveEvent> {
 					}
 				}
 
-				if (Objects.nonNull(offsetCollition) && ((Floor) offsetCollition).specialFloor) {
+				if (Objects.nonNull(offsetCollition) && ((Floor) offsetCollition).isSpecial()) {
 					setY = offsetCollition.getPosition().getY() - actor.getDimension().getHeight();
 				}
 			}

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import juan.project.game.Constants;
-import juan.project.graphics.Game;
 import juan.project.world.entity.event.impl.MoveEvent.MoveDirection;
 import juan.project.world.entity.impl.Floor;
 import juan.project.world.entity.impl.Hammer;
@@ -21,10 +20,21 @@ import juan.project.world.entity.impl.Stair;
  */
 public class MapGenerator {
 
+	/**
+	 * Represents the maximum floor amount
+	 */
 	private static final int MAXIMUM_FLOORS = 7;
+	
+	/**
+	 * Represents the slope floor amount
+	 */
 	private static final int SLOPE_FLOOR_AMOUNT = 20;
 	
-	// Procedural generation maps
+	/**
+	 * Generates a procedural map (sort of :p)
+	 * @param player	the player
+	 * @param monkey	the monkey
+	 */
 	public static void generateMap(final PlayerActor player, final Monkey monkey) {	
 		int yDivisions = (int) (Constants.DIMENSION.getHeight() / MAXIMUM_FLOORS);
 		
@@ -36,52 +46,52 @@ public class MapGenerator {
 		MoveDirection opositeDirection = constructDirection.equals(MoveDirection.RIGHT) ? MoveDirection.LEFT : MoveDirection.RIGHT;
 		
 		Princess princess = null;
-		
 		boolean placedHammer = false;
-		// XXX: magic variable: 170
+		
 		Floor floorNode = doFloor(constructDirection.equals(MoveDirection.RIGHT) ? 0 : (int) (Constants.DIMENSION.getWidth() - 170), initialY, 0);
 		for (int i = 0; i < yDivisions; i++) {
 			boolean cr = constructDirection.equals(MoveDirection.RIGHT);
 			Floor x = null;
-			GameMap.registerActor(x = doFloor(floorNode.getPosition().getX(), floorNode.getPosition().getY(), smallFloorWidth).addContinuity(constructDirection));
+			GameLogic.registerActor(x = doFloor(floorNode.getPosition().getX(), floorNode.getPosition().getY(), smallFloorWidth).addContinuity(constructDirection));
 			
 			if (Objects.isNull(monkey.getStartingFloor())) {
 				monkey.setStartingFloor(x);
 				monkey.getPosition().setX(x.getPosition().getX() + ((x.getDimension().getWidth() / 2) - (monkey.getDimension().getWidth() / 2)));
 				monkey.getPosition().setY(x.getPosition().getY() - monkey.getDimension().getHeight());
 				
-				GameMap.registerActor(monkey);
+				GameLogic.registerActor(monkey);
 			}
 			
 			if (!placedHammer && i > 0 && Math.random() > 0.5D) {
-				GameMap.registerActor(new Hammer(new Position(x.getPosition().getX() / 2, x.getPosition().getY() - Constants.FLOOR_HEIGHT * 3)));
+				GameLogic.registerActor(new Hammer(new Position(x.getPosition().getX() / 2, x.getPosition().getY() - Constants.FLOOR_HEIGHT * 3)));
 				placedHammer = true;
 			}
 			
 			List<Floor> floors = doScaledFloors(floorNode.getPosition().getX() + (cr ? smallFloorWidth : 0), floorNode.getPosition().getY(), bigFloorWidth, SLOPE_FLOOR_AMOUNT, constructDirection);
 			floorNode = floors.get(floors.size() - 1);
 			for (Floor f : floors) {
-				GameMap.registerActor(f);
+				GameLogic.registerActor(f);
 				
 			}
 			
 			x = doFloor(floorNode.getPosition().getX() + (cr ? 0 : -smallFloorWidth), floorNode.getPosition().getY(), smallFloorWidth).addContinuity(opositeDirection);
-			GameMap.registerActor(x);
+			GameLogic.registerActor(x);
 			
 			if (Objects.isNull(princess)) {
 				int xx = floorNode.getPosition().getX() + (cr ? 0 : -smallFloorWidth);
 				princess = new Princess(new Position(xx, 0));
 				int yy = floorNode.getPosition().getY() - princess.getDimension().getHeight();
 				princess.getPosition().setY(yy);
-				GameMap.registerActor(princess);
+				GameLogic.registerActor(princess);
 			}
 			
 			if (!cr) {
 				floorNode = x;
 			}
+			
 			Stair stair = null;
 			int half = (smallFloorWidth / 2) - (Constants.STAIR_DEFAULT_WIDTH / 2);
-			GameMap.registerActor(stair = doStair(floorNode.getPosition().getX() + half, floorNode.getPosition().getY(), yDivisions));
+			GameLogic.registerActor(stair = doStair(floorNode.getPosition().getX() + half, floorNode.getPosition().getY(), yDivisions));
 			
 			// for the stair modifications :)
 			floorNode = doFloor(floorNode.getPosition().getX(), floorNode.getPosition().getY() + stair.getDimension().getHeight(), smallFloorWidth);
@@ -90,11 +100,11 @@ public class MapGenerator {
 			boolean deleted = false;
 			
 			if (stairEndY >= Constants.DIMENSION.getHeight()) {
-				GameMap.deleteActor(stair);
+				GameLogic.deleteActor(stair);
 				deleted = true;
 			}
 			if (floorEndY >= Constants.DIMENSION.getHeight()) {
-				GameMap.deleteActor(floorNode);
+				GameLogic.deleteActor(floorNode);
 				deleted = true;
 			}
 			
@@ -102,7 +112,7 @@ public class MapGenerator {
 				if (Objects.nonNull(x)) {
 					player.getPosition().setX(x.getPosition().getX());
 					player.getPosition().setY(x.getPosition().getY() - player.getDimension().getHeight());
-					GameMap.registerActor(player);
+					GameLogic.registerActor(player);
 				}
 				break;
 			}
@@ -112,9 +122,18 @@ public class MapGenerator {
 			opositeDirection = opDir;
 		}
 		
-		GameMap.setDivisions(MAXIMUM_FLOORS - 2);
+		GameLogic.setDivisions(MAXIMUM_FLOORS - 2);
 	}
 	
+	/**
+	 * Takes care of the scaled floors 
+	 * @param x	the x coordinate
+	 * @param y	the y coordinate
+	 * @param width	the width of the floor
+	 * @param pieces	the n pieces in which we are going to split the floor
+	 * @param direction	the direction of construction
+	 * @return	the floors returned as a list
+	 */
 	public static List<Floor> doScaledFloors(int x, int y, final int width, final int pieces, MoveDirection direction) {
 		final List<Floor> floor = new ArrayList<>();
 		int size = width / pieces;
@@ -126,18 +145,39 @@ public class MapGenerator {
 		return floor;
 	}
 	
+	/**
+	 * Does a normal floor
+	 * @param x	the x coordinate
+	 * @param y	the y coordinate
+	 * @param width	the width of the floor
+	 * @return	the floor instance
+	 */
 	public static Floor doFloor(final int x, final int y, final int width) {
 		return doFloor(x, y, width, false);
 	}
 
-
+	/**
+	 * Does a floor with some desired parameter
+	 * @param x	the x coordinate
+	 * @param y	the y coordinate
+	 * @param width	the width of the floor
+	 * @param specialFloor	is the floor an special floor
+	 * @return	the floor instance
+	 */
 	public static Floor doFloor(final int x, final int y, final int width, final boolean specialFloor) {
 		int height = Constants.FLOOR_HEIGHT;
 		final Floor floor = new Floor(new Position(x, y), new Dimension(width, height));
-		floor.specialFloor = specialFloor;
+		floor.setSpecialFloor(specialFloor);
 		return floor;
 	}
 
+	/**
+	 * Does a stair 
+	 * @param x	the x coordinate
+	 * @param y	the y coordinate
+	 * @param yDivisions	the y divisions  of the stair (graphical improvement)
+	 * @return	the stair instance
+	 */
 	public static Stair doStair(final int x, final int y, int yDivisions) {
 		return new Stair(new Position(x, y), new Dimension(Constants.STAIR_DEFAULT_WIDTH, yDivisions));
 	}

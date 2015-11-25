@@ -13,6 +13,9 @@ import juan.project.world.entity.impl.PlayerActor;
  */
 public class JumpHandler implements Handler<JumpEvent> {
 
+	/**
+	 * Represents the jump handler instance
+	 */
 	public static final JumpHandler JUMP_HANDLER = new JumpHandler();
 	
 	@Override

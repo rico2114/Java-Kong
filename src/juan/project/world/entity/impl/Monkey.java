@@ -4,10 +4,10 @@ import java.awt.Graphics2D;
 import java.util.Objects;
 
 import juan.project.graphics.Assets;
-import juan.project.graphics.Game;
 import juan.project.util.RandomUtils;
 import juan.project.world.Dimension;
-import juan.project.world.GameMap;
+import juan.project.world.Game;
+import juan.project.world.GameLogic;
 import juan.project.world.GameStage;
 import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
@@ -20,28 +20,58 @@ import juan.project.world.entity.CollidableActor;
  */
 public class Monkey extends CollidableActor {
 
+	/**
+	 * Represents the monkey last move
+	 */	
 	private long lastMove;
+	
+	/**
+	 * Represents the last barrel thrown in
+	 */
 	private long lastBarrelMod;
+	
+	/**
+	 * Represents the animation id of the monkey
+	 */
 	private int currentImage = Assets.MONKEY_LEFT_HAND;
+	
+	/**
+	 * Represents the next barrel in time
+	 */
 	private int nextBarrelIn;
 
+	/**
+	 * Represents the initial floor of the monkey
+	 */
 	private Floor startingFloor;
 
+	/**
+	 * Constructs the monkey
+	 * @param position	the position of themonkey
+	 */
 	public Monkey(Position position) {
 		super(Assets.IMAGES[Assets.MONKEY_LEFT_HAND], position, new Dimension(Assets.IMAGES[Assets.MONKEY_LEFT_HAND].getWidth(), Assets.IMAGES[Assets.MONKEY_LEFT_HAND].getHeight()));
 	}
 	
+	/**
+	 * Gets the starting floor of the monkey
+	 * @return	the starting floor
+	 */
 	public Floor getStartingFloor() {
 		return startingFloor;
 	}
 
+	/**
+	 * Sets the starting floor of the monkey
+	 * @param floor	the floor
+	 */
 	public void setStartingFloor(final Floor floor) {
 		this.startingFloor = floor;
 	}
 
 	@Override
 	public void render(Graphics2D g2d) {
-		int complexity = Math.abs(getPosition().getY() - Game.getPlayer().getPosition().getY()) / (GameMap.getDivisions() / Game.getLevel().getBarrelComplexity());
+		int complexity = Math.abs(getPosition().getY() - Game.getPlayer().getPosition().getY()) / (GameLogic.getDivisions() / Game.getLevel().getBarrelComplexity());
 		
 		if (complexity <= 45) {
 			complexity += RandomUtils.RANDOM.nextInt(15);
@@ -52,7 +82,7 @@ public class Monkey extends CollidableActor {
 
 		if (System.currentTimeMillis() - lastMove >= 145) {
 			int next = -1;
-			if (GameMap.getGameStage().equals(GameStage.PLAYING))
+			if (GameLogic.getGameStage().equals(GameStage.PLAYING))
 				next = currentImage == Assets.MONKEY_LEFT_HAND ? Assets.MONKEY_RIGHT_HAND : Assets.MONKEY_LEFT_HAND;
 			else 
 				next = currentImage == Assets.MONKEY_INTRO ? Assets.MONKEY_INTRO_2 : Assets.MONKEY_INTRO;
@@ -72,7 +102,7 @@ public class Monkey extends CollidableActor {
 					barrel.getPosition().setY(barrel.getPosition().getY() - barrel.getDimension().getHeight());
 					barrel.setGoingRight(RandomUtils.RANDOM.nextBoolean());
 
-					GameMap.registerActor(barrel);
+					GameLogic.registerActor(barrel);
 				}
 				lastBarrelMod = System.currentTimeMillis();
 			}
@@ -83,9 +113,5 @@ public class Monkey extends CollidableActor {
 
 	@Override
 	public void doCollision(ActorModel actor) {
-		if (actor.getClass().equals(PlayerActor.class)) {
-			// / you won!
-			//System.out.println("I WON");
-		}
 	}
 }

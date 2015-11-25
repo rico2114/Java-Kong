@@ -2,7 +2,7 @@ package juan.project.game;
 
 import javax.swing.JFrame;
 
-import juan.project.graphics.Game;
+import juan.project.world.Game;
 
 /**
  * Created with eclipse 8/10/2015 21:40:54

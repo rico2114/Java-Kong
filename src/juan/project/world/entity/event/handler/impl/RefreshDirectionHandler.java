@@ -13,6 +13,9 @@ import juan.project.world.entity.impl.PlayerActor;
  */
 public class RefreshDirectionHandler implements Handler<RefreshDirectionEvent> {
 
+	/**
+	 * Represents the refresh direction handler
+	 */
 	public static final RefreshDirectionHandler REFRESH_DIRECTION_HANDLER = new RefreshDirectionHandler();
 	
 	@Override

@@ -1,4 +1,4 @@
-package juan.project.graphics;
+package juan.project.world;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -6,16 +6,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Objects;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 import juan.project.game.Constants;
-import juan.project.world.GameMap;
-import juan.project.world.GameStage;
-import juan.project.world.LevelConfiguration;
-import juan.project.world.MapGenerator;
-import juan.project.world.Position;
 import juan.project.world.entity.event.handler.impl.JumpHandler;
 import juan.project.world.entity.event.handler.impl.MovementHandler;
 import juan.project.world.entity.event.handler.impl.RefreshDirectionHandler;
@@ -32,6 +28,9 @@ import juan.project.world.entity.impl.PlayerActor;
  */
 public class Game extends JPanel implements ActionListener, KeyListener {
 
+	/**
+	 * Represents the configuration levels
+	 */
 	private static final LevelConfiguration [] LEVELS = new LevelConfiguration[] {
 		new LevelConfiguration(MoveDirection.RIGHT, 2), new LevelConfiguration(MoveDirection.LEFT, 1)
 	};
@@ -62,6 +61,9 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	 */
 	private final Timer timer = new Timer(10, this);
 	
+	/**
+	 * Represents the current level of the game
+	 */
 	private static int level;
 
 	/**
@@ -77,14 +79,14 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	public Game() {
 		timer.start();
 		byte defaultTime = (byte) (((3 & 3) << 6) | 60);
-		GameMap.setMaximumTime(defaultTime);
+		GameLogic.setMaximumTime(defaultTime);
 	}
 	
 	/**
 	 * Updates the logic of the map
 	 */
 	public void updateLogic() {
-		GameMap.updateLogic();
+		GameLogic.updateLogic();
 	}
 	
 	@Override
@@ -92,7 +94,7 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 		super.paint(g);
 		
 		final Graphics2D g2d = (Graphics2D) g;
-		GameMap.render(g2d);
+		GameLogic.render(g2d);
 		
 		update();
 	}
@@ -110,26 +112,26 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		if (GameMap.getGameStage().equals(GameStage.USERNAME_SELECT)) {
+		if (GameLogic.getGameStage().equals(GameStage.USERNAME_SELECT)) {
 			System.out.println(e.getKeyCode());
 			if (e.getKeyCode() == 8) {
-				GameMap.deleteChar();
+				GameLogic.deleteChar();
 			} else if (e.getKeyCode() == 10 || e.getKeyCode() == 16) {
 				if (e.getKeyCode() == 10) {
-					GameMap.login();
+					GameLogic.login();
 				} else {
 					return;
 				}
 			} else {
-				GameMap.appendToUsername("" + e.getKeyChar());
+				GameLogic.appendToUsername("" + e.getKeyChar());
 			}
 		}
 		
 		
-		if (GameMap.getGameStage().equals(GameStage.DEAD) || GameMap.getGameStage().equals(GameStage.NEW_LEVEL)) {
-			GameMap.clearActors();
+		if (GameLogic.getGameStage().equals(GameStage.DEAD) || GameLogic.getGameStage().equals(GameStage.NEW_LEVEL)) {
+			GameLogic.clearActors();
 			MapGenerator.generateMap(Game.PLAYER, Game.MONKEY);
-			GameMap.setGameStage(GameStage.PLAYING);
+			GameLogic.setGameStage(GameStage.PLAYING);
 			return;
 		}
 		
@@ -145,16 +147,21 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 	}
 	
 	public void update() {
+		MoveDirection dispatchDirection = null;
 		if (keys[68] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.RIGHT, Constants.PLAYER_SPEED));
+			dispatchDirection = MoveDirection.RIGHT;
 		} else if (keys[65] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.LEFT, Constants.PLAYER_SPEED));
+			dispatchDirection = MoveDirection.LEFT;
 		}
 		
 		if (keys[83] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.DOWN, Constants.PLAYER_SPEED));
+			dispatchDirection = MoveDirection.DOWN;
 		} else if (keys[87] == true) {
-			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(MoveDirection.UP, Constants.PLAYER_SPEED));
+			dispatchDirection = MoveDirection.UP;
+		}
+		
+		if (Objects.nonNull(dispatchDirection)) {
+			MovementHandler.MOVEMENT_HANDLER.interact(PLAYER, new MoveEvent(dispatchDirection, Constants.PLAYER_SPEED));
 		}
 		
 		if (keys[32] == true) {
@@ -162,22 +169,42 @@ public class Game extends JPanel implements ActionListener, KeyListener {
 		}
 	}
 	
+	/**
+	 * Gets the monkey instance
+	 * @return	the monkey
+	 */
 	public static Monkey getMonkey() {
 		return MONKEY;
 	}
 	
+	/**
+	 * Gets the player 
+	 * @return	the player
+	 */
 	public static PlayerActor getPlayer() {
 		return PLAYER;
 	}
 	
+	/**
+	 * Sets the level of the game
+	 * @param l	the game id
+	 */
 	public static void setLevel(final int l) {
 		level = l;
 	}
 	
+	/**
+	 * Gets the level id
+	 * @return	the level id
+	 */
 	public static int getLevelId() {
 		return level;
 	}
 	
+	/**
+	 * Gets the level configuration
+	 * @return	the level configuration
+	 */
 	public static LevelConfiguration getLevel() {
 		return LEVELS[level];
 	}

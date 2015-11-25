@@ -7,7 +7,7 @@ import java.util.Objects;
 import juan.project.game.Constants;
 import juan.project.graphics.Assets;
 import juan.project.world.Dimension;
-import juan.project.world.GameMap;
+import juan.project.world.GameLogic;
 import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
@@ -121,7 +121,7 @@ public class PlayerActor extends ActorModel {
 				}
 				
 				if (!increasingJump) {
-					CollidableActor offsetCollition = GameMap.getActorCollition(this, 1, Constants.SCALED_FLOOR_HEIGHT * 2, Floor.class);
+					CollidableActor offsetCollition = GameLogic.getActorCollition(this, 1, Constants.SCALED_FLOOR_HEIGHT * 2, Floor.class);
 					
 					if (Objects.nonNull(offsetCollition)) {
 						completeJump();
@@ -151,7 +151,7 @@ public class PlayerActor extends ActorModel {
 		getPosition().setY(y);
 		g2d.drawImage(getImage(), getPosition().getX(), y, null);
 		g2d.setColor(Color.RED);
-		g2d.drawString(GameMap.getUsername(), getPosition().getX(), y);
+		g2d.drawString(GameLogic.getUsername(), getPosition().getX(), y);
 
 	}
 	

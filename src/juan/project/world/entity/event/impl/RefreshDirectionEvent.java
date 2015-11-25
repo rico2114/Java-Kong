@@ -8,5 +8,8 @@ import juan.project.world.entity.event.Event;
  */
 public class RefreshDirectionEvent implements Event {
 
+	/**
+	 * Represents the refresh event, no need for any parameters
+	 */
 	public static final RefreshDirectionEvent REFRESH_DIRECTION_EVENT = new RefreshDirectionEvent();
 }

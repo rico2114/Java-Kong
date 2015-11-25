@@ -16,12 +16,31 @@ import juan.project.world.entity.CollidableActor;
  */
 public class Stair extends CollidableActor {
 	
+	/**
+	 * Represents the stair minimum alpha
+	 */
 	private static final int MINIMUM = 80;
+	
+	/**
+	 * Represents the stair maximum alpha
+	 */
 	private static final int MAXIMUM = 180;
 	
+	/**
+	 * Represents the current stair alpha effect
+	 */
 	private int stairAlphaEffect = MAXIMUM;
+	
+	/**
+	 * Is our stair alpha decreasing or not
+	 */
 	private boolean decreasing = true;
 	
+	/**
+	 * Construct the stair in a given position and dimension
+	 * @param position	the position of the stair
+	 * @param dimension	the dimension of the stair
+	 */
 	public Stair(Position position, Dimension dimension) {
 		super(null, position, dimension);
 	}

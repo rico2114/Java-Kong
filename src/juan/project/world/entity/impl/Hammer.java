@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 
 import juan.project.graphics.Assets;
 import juan.project.world.Dimension;
-import juan.project.world.GameMap;
+import juan.project.world.GameLogic;
 import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
 import juan.project.world.entity.CollidableActor;
@@ -15,8 +15,15 @@ import juan.project.world.entity.CollidableActor;
  */
 public class Hammer extends CollidableActor {
 
+	/**
+	 * Should we remove the hammer
+	 */
 	private boolean removeRequest = false;
 	
+	/**
+	 * Construct a hammer at a given position
+	 * @param position	the position
+	 */
 	public Hammer(Position position) {
 		super(Assets.IMAGES[Assets.MAP_HAMMER], position, new Dimension(Assets.IMAGES[Assets.MAP_HAMMER].getWidth(), Assets.IMAGES[Assets.MAP_HAMMER].getHeight()));
 	}
@@ -35,6 +42,6 @@ public class Hammer extends CollidableActor {
 		
 		// To avoid synchronization on the actors list :-), nice trick (logic is done first, rendering later))
 		if (removeRequest)
-			GameMap.deleteActor(this);
+			GameLogic.deleteActor(this);
 	}
 }

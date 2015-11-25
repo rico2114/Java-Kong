@@ -6,7 +6,7 @@ import java.util.List;
 
 import juan.project.graphics.Assets;
 import juan.project.world.Dimension;
-import juan.project.world.GameMap;
+import juan.project.world.GameLogic;
 import juan.project.world.GameStage;
 import juan.project.world.Position;
 import juan.project.world.entity.ActorModel;
@@ -23,72 +23,164 @@ import juan.project.world.entity.event.impl.RefreshDirectionEvent;
  */
 public class Barrel extends CollidableActor {
 
+	/**
+	 * Represents all the processed collisions (cached)
+	 */
 	private List<CollidableActor> processedCollisions = new ArrayList<>();
+	
+	/**
+	 * Represents all the stairs completed to avoid some pesky issues
+	 */
 	private final List<Stair> stairsCompleted = new ArrayList<>();
 	
+	/**
+	 * Should we deregister this actor
+	 */
 	private boolean deregister = false;
+	
+	/**
+	 * Is our barrel going right
+	 */
 	private boolean goingRight = true;
+	
+	/**
+	 * Is our going down
+	 */
 	private boolean goingDown;
+	
+	/**
+	 * Are we going down and it has been possible
+	 */
 	private boolean goingDownEffective;
+	
+	/**
+	 * Is our barrel in the stair
+	 */
 	private boolean inStair;
 	
+	/**
+	 * Represents the floor id of the barrel
+	 */
 	private int floorId = 0;
+	
+	/**
+	 * Represents the default animation id of the barrel
+	 */
 	private int animationId = Assets.BARREL_FIRST;
 	
+	/**
+	 * Represents the last animation change
+	 */
 	private long lastAnimationChange;
 
+	/**
+	 * Constructs the barrel based on the position
+	 * @param position	the position of the barrel
+	 */
 	public Barrel(Position position) {
 		super(Assets.IMAGES[Assets.BARREL_FIRST], position, new Dimension(Assets.IMAGES[Assets.BARREL_FIRST].getWidth(), Assets.IMAGES[Assets.BARREL_FIRST].getHeight()));
 	}
 	
+	/**
+	 * Sets the last animation change
+	 * @param time	the time
+	 */
 	public void setLastAnimationChange(final long time) {
 		this.lastAnimationChange = time;
 	}
 	
+	/**
+	 * Gets the last animation change
+	 * @return	the last animation change
+	 */
 	public long getLastAnimationChange() {
 		return lastAnimationChange;
 	}
 	
+	/**
+	 * Gets the animation id
+	 * @return	the animation id
+	 */
 	public int getAnimationId() {
 		return animationId;
 	}
 	
+	/**
+	 * Sets the animation id to a desire id
+	 * @param id	the id
+	 */
 	public void setAnimationId(final int id) {
 		this.animationId = id;
 	}
 	
+	/**
+	 * Sets the going right variable state to a desired state
+	 * @param state	the state
+	 */
 	public void setGoingRight(final boolean state) {
 		this.goingRight = state;
 	}
 	
+	/**
+	 * Is our barrel going right or not
+	 * @return	true if it is
+	 */
 	public boolean isGoingRight() {
 		return goingRight;
 	}
 	
+	/**
+	 * Sets the going down to a desired state
+	 * @param state	the state
+	 */
 	public void setGoingDown(final boolean state) {
 		this.goingDown = state;
 	}
 	
+	/**
+	 * Is our barrel in the stair
+	 * @return	true if it is
+	 */
 	public boolean isInStair() {
 		return inStair;
 	}
 	
+	/**
+	 * Sets the going down effective to a desired state
+	 * @param state	the state
+	 */
 	public void setGoingDownEffective(final boolean state) {
 		this.goingDownEffective = state;
 	}
 	
+	/**
+	 * Increases the floor 
+	 */
 	public void increaseFloor() {
 		floorId ++;
 	}
 	
+	/**
+	 * Gets the floor id
+	 * @return	the floor id
+	 */
 	public int getFloorId() {
 		return floorId;
 	}
 	
+	/**
+	 * Adds an stair into the stiar completed list
+	 * @param stair	the stair
+	 */
 	public void addStair(final Stair stair) {
 		stairsCompleted.add(stair);
 	}
 	
+	/**
+	 * Has our barrel completed the stair
+	 * @param stair	the stair
+	 * @return	true if it has
+	 */
 	public boolean hasCompletedStair(final Stair stair) {
 		return stairsCompleted.contains(stair);
 	}
@@ -126,7 +218,7 @@ public class Barrel extends CollidableActor {
 			}
 			
 			if (!deregister) {
-				GameMap.displayMessage(GameStage.DEAD, "You have lost", "You were struck by barrel.");
+				GameLogic.displayMessage(GameStage.DEAD, "You have lost", "You were struck by barrel.");
 			}
 				
 		}
@@ -134,11 +226,10 @@ public class Barrel extends CollidableActor {
 	
 	@Override
 	public void render(Graphics2D g2d) {
-		int speed = 3; //XXX: add complexity
+		int speed = 3;
 		
-		// XXX: I KNOW THIS IS UGLY, BUT I NEED TO CLEAN UP MOVEMENT FIRST YUK!
-		processedCollisions = GameMap.getActorCollition(this);
-		inStair = GameMap.actorCollidesWith(processedCollisions, Stair.class) != null;
+		processedCollisions = GameLogic.getActorCollition(this);
+		inStair = GameLogic.actorCollidesWith(processedCollisions, Stair.class) != null;
 		
 		if (!goingDownEffective) {
 			if (goingRight) {
@@ -152,8 +243,8 @@ public class Barrel extends CollidableActor {
 			MovementHandler.MOVEMENT_HANDLER.interact(this, new MoveEvent(MoveDirection.DOWN, speed));
 		}
 				
-		if ((getFloorId() == GameMap.getDivisions() - 2) || deregister) {
-			GameMap.deleteActor(this);
+		if ((getFloorId() == GameLogic.getDivisions() - 2) || deregister) {
+			GameLogic.deleteActor(this);
 		}
 		
 		super.render(g2d);
